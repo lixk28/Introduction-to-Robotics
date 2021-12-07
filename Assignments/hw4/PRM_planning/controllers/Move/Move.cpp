@@ -1,10 +1,6 @@
 #include <webots/Robot.hpp>
 #include <webots/Motor.hpp>
 #include <webots/Keyboard.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <limits>
 
@@ -75,9 +71,8 @@ int main(int argc, char **argv) {
   Keyboard keyboard;
   keyboard.enable(1); // set keyboard read frequency
   double time_step = robot->getBasicTimeStep(); // set virtual time step in simulation
-  double velocity = 0.3 * MAX_SPEED;  // set velocity
-  while (robot->step(time_step) != -1) 
-  {
+  double velocity = 0.5 * MAX_SPEED;  // set velocity
+  while (robot->step(time_step) != -1) {
     int key_value1 = keyboard.getKey();
 		int key_value2 = keyboard.getKey();
 
