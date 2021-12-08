@@ -17,7 +17,7 @@ RectangleArena {
   floorAppearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "../textures/maze_prm_good.png"
+        "../textures/maze_prm.png"
       ]
       repeatS FALSE
       repeatT FALSE
@@ -450,7 +450,7 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation 0.10000355047617919 0.15000017806915997 -9.91930764593658e-06
+        translation 0.10000355047617919 0.15000017806915864 -9.919307645935814e-06
         rotation -2.648348089542807e-06 -0.9999999999938772 2.2873025776821987e-06 2.1722673683778644
         children [
           Shape {
@@ -644,8 +644,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation -0.09999242781475638 -0.1499998854929599 -4.153210937977129e-06
-        rotation 1.34902342752967e-06 0.9999999999800278 6.174502265220461e-06 6.240621736487791
+        translation -0.09999242781475638 -0.1499998854929599 -4.15321093797787e-06
+        rotation 1.3490234275297544e-06 0.9999999999800278 6.174502265220845e-06 6.240621736487791
         children [
           Shape {
             appearance PBRAppearance {
@@ -838,8 +838,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation 0.10000688012812281 -0.15000015975424394 -5.773163897220541e-06
-        rotation 1.907775157367168e-07 0.9999999999999463 2.663152183237293e-07 5.437173573839287
+        translation 0.10000688012812281 -0.15000015975424394 -5.7731638972162414e-06
+        rotation 1.907775157367162e-07 0.9999999999999463 2.663152183237284e-07 5.437173573839287
         children [
           Shape {
             appearance PBRAppearance {
@@ -1032,8 +1032,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation -0.09999901100245019 0.1499998681398249 -8.976150245296854e-06
-        rotation -8.494764250171973e-08 -0.9999999999999908 1.0502599831558265e-07 2.975567748030485
+        translation -0.09999901100245019 0.1499998681398249 -8.976150245296807e-06
+        rotation -8.494764250171976e-08 -0.9999999999999908 1.0502599831558281e-07 2.9755677480304845
         children [
           Shape {
             appearance PBRAppearance {
