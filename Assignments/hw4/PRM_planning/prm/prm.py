@@ -143,25 +143,25 @@ def prm(roadmap):
   return graph, vertex2coord, path
 
 def draw_graph(graph, vertex2coord, img):
-  img_graph = img
+  # img_graph = img
   for i in range(NUM_SAMPLE + 2):
-    img_graph = cv2.circle(img=img_graph, center=(vertex2coord[i][1], vertex2coord[i][0]), radius=3, color=(255, 0, 0))
-  cv2.imwrite("../textures/maze_graph.png", img_graph)
+    cv2.circle(img=img, center=(vertex2coord[i][1], vertex2coord[i][0]), radius=3, color=(255, 0, 0), thickness=1)
+  cv2.imwrite("../textures/maze_graph.png", img)
 
 def draw_path(path, vertex2coord, img):
-  # print(path)
-  path.reverse()
   img_path = img
+  path.reverse()
+  # print(path)
   for i in range(len(path) - 1):
     v1 = path[i]
     v2 = path[i + 1]
     # 注意这里坐标 x 和 y 要调换位置
     # 因为 opencv 图像的坐标和矩阵坐标是不一样的
-    img_path = cv2.line(img=img_path, pt1=(vertex2coord[v1][1], vertex2coord[v1][0]), pt2=(vertex2coord[v2][1], vertex2coord[v2][0]), color=(0, 0, 0), thickness=3)
+    cv2.line(img=img_path, pt1=(vertex2coord[v1][1], vertex2coord[v1][0]), pt2=(vertex2coord[v2][1], vertex2coord[v2][0]), color=(0, 0, 0), thickness=3)
   cv2.imwrite("../textures/maze_prm.png", img_path)
 
 if __name__ == "__main__":
-  img = cv2.imread("../textures/maze.png", cv2.IMREAD_UNCHANGED)
+  img = cv2.imread("../textures/maze.png")
   # cv2.namedWindow("img", cv2.WINDOW_AUTOSIZE)
   # cv2.imshow("img", img)
   # cv2.waitKey(0)
@@ -171,19 +171,19 @@ if __name__ == "__main__":
   # print("height = {}".format(height))
   # print("channels = {}".format(channels))
 
-  img_gray = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)  # 灰度化
+  img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 灰度化
   height, width = img_gray.shape
   for i in range(height):
     for j in range(width):
-      img_gray[i, j] = 0 if img_gray[i, j] < 50 else 255
+      img_gray[i, j] = 0 if img_gray[i, j] < 50 else 255  # 二值化
   # ret, img_threshold = cv2.threshold(img_gray, 50, 255, cv2.THRESH_BINARY)  # 二值化
   
-  black_pixel_list = []
+  black_pixel_list = [] # 黑色像素的坐标列表
   for i in range(height):
     for j in range(width):
       if img_gray[i][j] == 0:
         black_pixel_list.append((j, i)) # holy shit
-  for b in black_pixel_list:
+  for b in black_pixel_list:  # 膨胀处理
     img_gray = cv2.circle(img=img_gray, center=b, radius=20, color=0, thickness=-1)
 
   cv2.imwrite("../textures/maze_processed.png", img_gray)
@@ -200,9 +200,10 @@ if __name__ == "__main__":
       roadmap[i, j] = OBSTACLE if img_mat[i, j] == 0 else EMPTY
 
   graph, vertex2coord, path = prm(roadmap)
-  print(graph)
+  # print(graph)
   # print(vertex2coord)
   # draw_graph(graph, vertex2coord, img)
+
   draw_path(path, vertex2coord, img)
 
 
