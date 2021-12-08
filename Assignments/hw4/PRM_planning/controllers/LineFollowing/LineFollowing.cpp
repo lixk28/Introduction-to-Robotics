@@ -63,10 +63,6 @@ int main()
   
 	while (robot->step(timeStep) != -1)
 	{
-    int key = keyboard.getKey();
-    if (key == 'S') // stop the car
-      break;
-
     const unsigned char *image = camera.getImage();
     int pixel_black_left = 0;
     int pixel_black_right = 0;
@@ -75,13 +71,13 @@ int main()
     {
       for (int y = 0; y < image_height; y++)
       {
-        int grey = camera.imageGetGrey(image, image_width, x, y);
+        int gray = camera.imageGetGrey(image, image_width, x, y);
 
-        if (grey < 128 && x < image_width / 2)  // grey pixel on the left part
+        if (gray < 128 && x < image_width / 2)  // grey pixel in the left part
         {
           pixel_black_left++;
         }
-        else if (grey < 128 && x >= image_width / 2)  // grey pixel on the right part
+        else if (gray < 128 && x >= image_width / 2)  // grey pixel in the right part
         {
           pixel_black_right++;
         }
@@ -93,35 +89,60 @@ int main()
       cout << "Right black pixel: " << pixel_black_right << endl;
     #endif
 
-    if (pixel_black_left - pixel_black_right > 200)  // turn left
+    if (pixel_black_left > pixel_black_right)
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.2;
+        speed1[i] = speed_forward[i];
         speed2[i] = speed_leftCircle[i];
       }
     }
-    else if (pixel_black_right - pixel_black_left > 200) // turn right
+    else if (pixel_black_left < pixel_black_right)
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.2;
+        speed1[i] = speed_forward[i];
         speed2[i] = speed_rightCircle[i];
       }
     }
-    else  // go straight 
+    else
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.3;
+        speed1[i] = speed_forward[i];
         speed2[i] = 0;
       }
     }
 
-		for (int i = 0; i < 4; i++)
-		{
-			motors[i]->setVelocity(speed1[i] + speed2[i]);
-		}
+    // if (pixel_black_left - pixel_black_right > 200)  // turn left
+    // {
+    //   for (int i = 0; i < 4; i++)
+    //   {
+    //     speed1[i] = speed_forward[i] * 0.2;
+    //     speed2[i] = speed_leftCircle[i];
+    //   }
+    // }
+    // else if (pixel_black_right - pixel_black_left > 200) // turn right
+    // {
+    //   for (int i = 0; i < 4; i++)
+    //   {
+    //     speed1[i] = speed_forward[i] * 0.2;
+    //     speed2[i] = speed_rightCircle[i];
+    //   }
+    // }
+    // else  // go straight 
+    // {
+    //   for (int i = 0; i < 4; i++)
+    //   {
+    //     speed1[i] = speed_forward[i] * 0.3;
+    //     speed2[i] = 0;
+    //   }
+    // }
+
+    for (int i = 0; i < 4; i++)
+    {
+      motors[i]->setVelocity(speed1[i] + speed2[i]);
+    }    
   }
 
   delete robot;
