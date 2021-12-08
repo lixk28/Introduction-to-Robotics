@@ -18,7 +18,7 @@
   ```
   
 运行方法：
-- 首先，在项目目录下 `cd` 到 `prm` 目录，然后运行 RPM 算法：
+- 首先，在项目目录下 `cd` 到 `prm` 目录，然后运行 PRM 算法（大概需要 20 - 30 秒）：
   ```shell
   cd ./PRM_planning/prm
   python3 prm.py
