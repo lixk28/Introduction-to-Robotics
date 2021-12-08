@@ -93,27 +93,27 @@ int main()
       cout << "Right black pixel: " << pixel_black_right << endl;
     #endif
 
-    if (pixel_black_left - pixel_black_right > 400)  // turn left
+    if (pixel_black_left - pixel_black_right > 200)  // turn left
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.6;
-        speed2[i] = speed_leftCircle[i] * 2;
+        speed1[i] = speed_forward[i] * 0.2;
+        speed2[i] = speed_leftCircle[i];
       }
     }
-    else if (pixel_black_right - pixel_black_left > 400) // turn right
+    else if (pixel_black_right - pixel_black_left > 200) // turn right
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.6;
-        speed2[i] = speed_rightCircle[i] * 2;
+        speed1[i] = speed_forward[i] * 0.2;
+        speed2[i] = speed_rightCircle[i];
       }
     }
     else  // go straight 
     {
       for (int i = 0; i < 4; i++)
       {
-        speed1[i] = speed_forward[i] * 0.6;
+        speed1[i] = speed_forward[i] * 0.3;
         speed2[i] = 0;
       }
     }
