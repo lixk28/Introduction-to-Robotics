@@ -3,7 +3,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation 0.12847188830882375 0.12917444951464302 0.9832644280695576 1.5931253652336805
-  position 2.618082828056817 -0.1506907791798672 8.918463112969405
+  position 2.7153399370176654 -0.1919347909046662 9.685717202587327
   followType "None"
 }
 TexturedBackground {
@@ -17,7 +17,7 @@ RectangleArena {
   floorAppearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "../textures/maze_prm.png"
+        "../textures/maze_rrt.png"
       ]
       repeatS FALSE
       repeatT FALSE
@@ -450,7 +450,7 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation 0.10000355047617919 0.15000017806915808 -9.919307645935814e-06
+        translation 0.10000355047617919 0.15000017806915297 -9.919307645935814e-06
         rotation -2.648348089542807e-06 -0.9999999999938773 2.287302577682199e-06 2.1722673683778644
         children [
           Shape {
@@ -644,8 +644,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation -0.09999242781475638 -0.1499998854929599 -4.153210937978052e-06
-        rotation 1.34902342752979e-06 0.9999999999800278 6.174502265221006e-06 6.240621736487791
+        translation -0.09999242781475638 -0.1499998854929599 -4.153210937978548e-06
+        rotation 1.3490234275301133e-06 0.9999999999800278 6.174502265222494e-06 6.240621736487791
         children [
           Shape {
             appearance PBRAppearance {
@@ -838,8 +838,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_SOLID Solid {
-        translation 0.10000688012812281 -0.15000015975424394 -5.7731638972162186e-06
-        rotation 1.90777515736716e-07 0.9999999999999463 2.6631521832372793e-07 5.437173573839287
+        translation 0.10000688012812281 -0.15000015975424394 -5.773163897216217e-06
+        rotation 1.9077751573671355e-07 0.9999999999999463 2.6631521832372496e-07 5.437173573839287
         children [
           Shape {
             appearance PBRAppearance {
