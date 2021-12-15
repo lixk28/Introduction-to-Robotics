@@ -23,7 +23,7 @@ int main()
 
 	double speed1[4];
 	double speed2[4];
-	double velocity = 8;
+	double velocity = 10;
 
 	for (int i = 0; i < 4; i++)
 	{
