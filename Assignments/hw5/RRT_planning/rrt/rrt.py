@@ -3,6 +3,7 @@ import numpy as np
 import math
 import argparse
 from tqdm import tqdm
+from scipy.interpolate import splrep, splev
 
 OBSTACLE = 1  # 障碍点
 EMPTY = 0 # 空白点
@@ -142,8 +143,6 @@ def draw_tree(vertex2coord, parent):
 
 def draw_path(vertex2coord, parent):
   img = cv.imread("../textures/maze.png") # 以 BGR 格式读取图片
-  # print(vertex2coord)
-  # print(parent)
   i = DEST
   while parent[i] != NIL:
     v1 = i
@@ -160,5 +159,8 @@ if __name__ == "__main__":
   map = get_map(img)
 
   vertex2coord, parent = rrt(map)
+  # print(vertex2coord)
+  # print(parent)
+
   draw_path(vertex2coord, parent)
 
