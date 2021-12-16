@@ -73,11 +73,11 @@ int main()
       {
         int gray = camera.imageGetGrey(image, image_width, x, y);
 
-        if (gray < 128 && x < image_width / 2)  // grey pixel in the left part
+        if (gray < 80 && x < image_width / 2)  // grey pixel in the left part
         {
           pixel_black_left++;
         }
-        else if (gray < 128 && x >= image_width / 2)  // grey pixel in the right part
+        else if (gray < 80 && x >= image_width / 2)  // grey pixel in the right part
         {
           pixel_black_right++;
         }
