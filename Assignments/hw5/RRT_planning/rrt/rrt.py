@@ -3,7 +3,6 @@ import numpy as np
 import math
 import argparse
 from tqdm import tqdm
-from scipy.interpolate import splrep, splev
 
 OBSTACLE = 1  # 障碍点
 EMPTY = 0 # 空白点
@@ -11,7 +10,7 @@ EMPTY = 0 # 空白点
 NUM_SAMPLE = 100000 # 采样点个数
 NUM_VERTEX = NUM_SAMPLE + 2 # 顶点总数
 
-# SOURCE 和 DEST 是起点和终点的索引
+# SOURCE 和 DEST 是起点和终点的索引，NIL 代表空节点
 SOURCE = 0
 DEST = 1
 NIL = -1
@@ -24,7 +23,11 @@ INF = 1e8
 
 EXPLORE_RATE = 0.9  # 探索率
 
-STEP_SIZE = 15 # 步长
+STEP_SIZE = 10 # 步长
+
+SMOOTH_ITER = 5000
+ALPHA = 0.4 # 保守率
+BETA = 0.6  # 平滑率
 
 # 图像处理
 def img_process():
@@ -47,6 +50,7 @@ def img_process():
   cv.imwrite("../textures/maze_processed.png", img) # 保存处理后的图像
   return img
 
+# 获得像素坐标到该像素是否是障碍的 0-1 矩阵
 def get_map(img):
   height, width = img.shape
   map = np.zeros(shape=(height, width), dtype=np.int8)  # 代表像素是否是障碍的矩阵
@@ -89,7 +93,8 @@ def collision_check(point1, point2, map):
 # RRT 算法 (goal-based)
 def rrt(map):
   height, width = map.shape
-  print(height, width)
+  print("map height: {}".format(height))
+  print("map width: {}".format(width))
   
   vertex2coord = {} # 每个节点索引到它矩阵坐标的映射
   vertex2coord[SOURCE] = SOURCE_COORD
@@ -132,93 +137,107 @@ def rrt(map):
     if euclid_distance((x_new, y_new), DEST_COORD) < STEP_SIZE: # 如果新节点到目标节点的距离小于步长
       parent[DEST] = i - 1  # 设置 DEST 的父节点是新节点，并跳出循环
       iterator.close()
-      print("reach the destination, break")
+      print("Reach the destination and stop searching")
+      print("The total number of rrt nodes is {}".format(len(vertex2coord)+1), end='\n\n')
       break
       
-  vertex2coord[DEST] = DEST_COORD
+  vertex2coord[DEST] = DEST_COORD # 最后将终点加入
 
   return vertex2coord, parent
 
-def draw_tree(vertex2coord, parent):
-  # todo
-  pass
-
-def gradient_smoothing(path, map):
-  path_smooth = path.copy()
-  path_smooth = np.asarray(path_smooth).astype(np.int32)
-  print(path_smooth.shape)
-  it = tqdm(iterable=range(2000), desc="gradient smoothing", bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}') # 迭代次数为 2000
-  for _ in it:
-    for i in range(1, len(path)-1, 1):
-      path_smooth[i][0] = int(np.ceil(path_smooth[i][0] + \
-                                      0.5 * (path[i][0] - path_smooth[i][0]) + \
-                                      0.5 * (path_smooth[i-1][0] - 2 * path_smooth[i][0] + path_smooth[i+1][0])))
-      path_smooth[i][1] = int(np.ceil(path_smooth[i][1] + \
-                                      0.5 * (path[i][1] - path_smooth[i][1]) + \
-                                      0.5 * (path_smooth[i-1][1] - 2 * path_smooth[i][1] + path_smooth[i+1][1])))
-  return path_smooth
-
+# 检查三个点是否会构成三角形
 def triangle_check(pt1, pt2, pt3):
-  # 检查三个点是否会构成三角形
   # 路径为 pt1 -> pt2 -> pt3
   area = pt1[0] * (pt2[1] - pt3[1]) + \
          pt2[0] * (pt3[1] - pt1[1]) + \
          pt3[0] * (pt1[1] - pt2[1])
-  if area == 0:
-    return False
-  else:
-    return True
+  return False if area == 0 else True
 
-def path_smoothing(path, map):
-  # 一拍脑子想出的平滑算法
+# 三角形平滑
+def triangle_smoothing(path, map):
+  # 一拍脑子想出的三角形平滑算法
   path_smooth = []
   path_smooth.append(SOURCE_COORD)
-  for i in range(1, len(path)-1, 2):
+  it = tqdm(iterable=range(1, len(path)-1, 2), desc="Triangle smoothing", \
+            bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+  for i in it:
     pt_prev, pt_curr, pt_next = path[i-1], path[i], path[i+1]
     if triangle_check(pt_prev, pt_curr, pt_next) and not collision_check(pt_prev, pt_next, map):  # 如果构成三角形，并且不会碰撞
-      # path_smooth.append(pt_prev) # 跳过中间点
-      path_smooth.append(pt_next)
+      path_smooth.append(pt_next) # 舍弃掉中间点 pt_curr
     else:
-      # path_smooth.append(pt_prev)
       path_smooth.append(pt_curr)
       path_smooth.append(pt_next)
   return path_smooth
 
-def draw_path(vertex2coord, parent, map):
+# 梯度下降平滑
+def gradient_smoothing(path, map):
+  path_smooth = path.copy()
+  path_smooth = np.asarray(path_smooth).astype(np.int32)
+  it = tqdm(iterable=range(SMOOTH_ITER), desc="Gradient smoothing", \
+            bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}')
+  for _ in it:
+    for i in range(1, len(path)-1, 1):
+      path_smooth[i][0] = int(np.ceil(path_smooth[i][0] + \
+                                      ALPHA * (path[i][0] - path_smooth[i][0]) + \
+                                      BETA * (path_smooth[i-1][0] - 2 * path_smooth[i][0] + path_smooth[i+1][0])))
+      path_smooth[i][1] = int(np.ceil(path_smooth[i][1] + \
+                                      ALPHA * (path[i][1] - path_smooth[i][1]) + \
+                                      BETA * (path_smooth[i-1][1] - 2 * path_smooth[i][1] + path_smooth[i+1][1])))
+  return path_smooth
+
+# 画出 RRT 生成树和初始路径
+def draw_tree(vertex2coord, parent, path):
+  img = cv.imread("../textures/maze.png")
+  for i in range(len(path)-1):  # 画初始路径
+    cv.line(img=img, pt1=(path[i][1], path[i][0]), pt2=(path[i+1][1], path[i+1][0]), \
+            color=(255, 0, 255), thickness=3, lineType=cv.LINE_AA)
+  flag = [False for _ in range(len(vertex2coord))]  # flag 标记每个节点，是否已经画过
+  for i in range(len(vertex2coord)):  # 回溯每个节点的所有祖先节点
+    while i != NIL:
+      if flag[i] == False:  # 已画过的不需要再画
+        cv.circle(img=img, center=(vertex2coord[i][1], vertex2coord[i][0]), radius=3, \
+                  color=(255, 0, 0), thickness=1, lineType=cv.LINE_AA)
+        flag[i] = True
+      i = parent[i]
+  cv.imwrite("./rrt_tree.png", img)
+
+# 画出给定路径
+def draw_path(path, img_name, draw_point=False):
+  img = cv.imread("../textures/maze.png")
+  if draw_point == True:
+    for i in range(len(path)):
+      cv.circle(img=img, center=(path[i][1], path[i][0]), radius=5, \
+                color=(255, 0, 0), thickness=1, lineType=cv.LINE_AA)
+  for i in range(len(path)-1):
+    cv.line(img=img, pt1=(path[i][1], path[i][0]), pt2=(path[i+1][1], path[i+1][0]), \
+            color=(0, 0, 0), thickness=3, lineType=cv.LINE_AA)
+  cv.imwrite(img_name, img)
+
+def draw_rrt(vertex2coord, parent, map):
   path = []
   i = DEST
   while i != NIL:
     path.append(vertex2coord[i])
     i = parent[i]
   path.reverse()
+  # print(len(path))
+  # print(path)
 
-  print(len(path))
-  print(path)
+  print("Path smoothing:")
+  path_triangle_smooth = triangle_smoothing(path, map)
+  path_gradient_smooth = gradient_smoothing(path_triangle_smooth, map)
+  print("The length of smoothed path is {}".format(len(path_gradient_smooth)))
 
-  path_smooth = path_smoothing(path, map)
+  # 原始路径、三角形平滑路径、剃度下降平滑路径的对比
+  draw_path(path=path, img_name="./raw_path.png", draw_point=True)
+  draw_path(path=path_triangle_smooth, img_name="./triangle_smooth_path.png", draw_point=True)
+  draw_path(path=path_gradient_smooth, img_name="./gradient_smooth_path.png", draw_point=True)
 
-  # img = cv.imread("../textures/maze.png")
-  # for i in range(len(path_smooth)-1):
-  #   cv.line(img=img, pt1=(path_smooth[i][1], path_smooth[i][0]), pt2=(path_smooth[i+1][1], path_smooth[i+1][0]), \
-  #           color=(0, 0, 0), thickness=3, lineType=cv.LINE_AA)
-  # cv.imwrite("../textures/maze_rrt_floyd-smooth.png", img)
+  # 画出 RRT 生成树
+  draw_tree(vertex2coord, parent, path)
 
-  path_smooth = gradient_smoothing(path_smooth, map)
-
-  print(len(path_smooth))
-  print(path_smooth)
-
-  # img = cv.imread("../textures/maze.png")
-  # for i in range(len(path_smooth)-1):
-  #   cv.line(img=img, pt1=(path_smooth[i][1], path_smooth[i][0]), pt2=(path_smooth[i+1][1], path_smooth[i+1][0]), \
-  #           color=(0, 0, 0), thickness=3, lineType=cv.LINE_AA)
-  # cv.imwrite("../textures/maze_rrt_gradient-smooth.png", img)
-
-  img = cv.imread("../textures/maze.png")
-  for i in range(len(path_smooth)-1):
-    cv.line(img=img, pt1=(path_smooth[i][1], path_smooth[i][0]), pt2=(path_smooth[i+1][1], path_smooth[i+1][0]), \
-            color=(0, 0, 0), thickness=3, lineType=cv.LINE_AA)
-  cv.imwrite("../textures/maze_rrt.png", img)
+  # 画出最终的路径，用于小车寻线
+  draw_path(path_gradient_smooth, "../textures/maze_rrt.png")
 
 if __name__ == "__main__":
   img = img_process() # 获得处理后的图像和像素矩阵
@@ -230,5 +249,5 @@ if __name__ == "__main__":
   # print(vertex2coord)
   # print(parent)
 
-  draw_path(vertex2coord, parent, map)
+  draw_rrt(vertex2coord, parent, map)
 
