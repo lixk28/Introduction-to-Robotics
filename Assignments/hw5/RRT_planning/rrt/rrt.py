@@ -228,7 +228,7 @@ def draw_rrt(vertex2coord, parent, map):
   path_gradient_smooth = gradient_smoothing(path_triangle_smooth, map)
   print("The length of smoothed path is {}".format(len(path_gradient_smooth)))
 
-  # 原始路径、三角形平滑路径、剃度下降平滑路径的对比
+  # 原始路径、三角形平滑路径、梯度下降平滑路径的对比
   draw_path(path=path, img_name="./raw_path.png", draw_point=True)
   draw_path(path=path_triangle_smooth, img_name="./triangle_smooth_path.png", draw_point=True)
   draw_path(path=path_gradient_smooth, img_name="./gradient_smooth_path.png", draw_point=True)
