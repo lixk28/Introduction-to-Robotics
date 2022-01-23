@@ -1,0 +1,139 @@
+#VRML_OBJ R2021a utf8
+Robot {
+  translation 0 0 0.04
+  rotation 0 0 1 0
+  children [
+    Lidar {
+      translation 0 0 0.06
+      rotation 0.5773509358554485 0.5773489358556708 0.5773509358554485 2.0943999999999994
+      numberOfLayers 1
+      maxRange 5
+      type "rotating"
+    }
+    GPS {
+    }
+    InertialUnit {
+      rotation 0 0 1 1.5708
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.06 0.07 0
+      }
+      device [
+        RotationalMotor {
+          name "motor1"
+          maxVelocity 20
+        }
+      ]
+      endPoint Solid {
+        translation 0.060000000000000275 0.07000000000000028 3.469446951953614e-18
+        children [
+          DEF WHEEL Shape {
+            geometry Cylinder {
+              height 0.03
+              radius 0.04
+            }
+          }
+        ]
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.06 0.07 0
+      }
+      device [
+        RotationalMotor {
+          name "motor2"
+          maxVelocity 20
+        }
+      ]
+      endPoint Solid {
+        translation -0.05999999999999983 0.07000000000000028 3.469446951953614e-18
+        children [
+          Shape {
+            geometry Cylinder {
+              height 0.03
+              radius 0.04
+            }
+          }
+        ]
+        name "solid(1)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.06 -0.07 0
+      }
+      device [
+        RotationalMotor {
+          name "motor3"
+          maxVelocity 20
+        }
+      ]
+      endPoint Solid {
+        translation 0.06000000000000005 -0.06999999999999984 3.469446951953614e-18
+        children [
+          Shape {
+            geometry Cylinder {
+              height 0.03
+              radius 0.04
+            }
+          }
+        ]
+        name "solid(2)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.06 -0.07 0
+      }
+      device [
+        RotationalMotor {
+          name "motor4"
+          maxVelocity 20
+        }
+      ]
+      endPoint Solid {
+        translation -0.05999999999999983 -0.06999999999999984 3.469446951953614e-18
+        children [
+          Shape {
+            geometry Cylinder {
+              height 0.03
+              radius 0.04
+            }
+          }
+        ]
+        name "solid(3)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF BODY Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 0.2 0.1 0.05
+      }
+    }
+  ]
+  boundingObject USE BODY
+  physics Physics {
+    density -1
+    mass 1
+  }
+  controller "my_controller"
+}
