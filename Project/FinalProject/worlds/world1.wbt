@@ -164,5 +164,5 @@ Robot {
     density -1
     mass 1
   }
-  controller "my_controller"
+  controller "my_controller1"
 }

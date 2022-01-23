@@ -32,23 +32,23 @@ double speedForward[4] = {v, v, v, v};
 double speedBackward[4] = {-v, -v, -v, -v};
 double speedLeftward[4] = {0.4 * v, 0.4 * v, v, v};
 double speedRightward[4] = {v, v, 0.4 * v, 0.4 * v};
-double speedLeftCircle[4] = {-0.2 * v, -0.2 * v, 0.2 * v, 0.2 * v};
-double speedRightCircle[4] = {0.2 * v, 0.2 * v, -0.2 * v, -0.2 * v};
+double speedLeftCircle[4] = {-0.1 * v, -0.1 * v, 0.1 * v, 0.1 * v};
+double speedRightCircle[4] = {0.1 * v, 0.1 * v, -0.1 * v, -0.1 * v};
 
 void setSpeed(int keyValue, double *speed);
 
 // param
-const int mapHeight = 600;
-const int mapWidth = 450;
-const double worldHeight = 6;
-const double worldWidth = 4.5;
+const int mapHeight = 1000;
+const int mapWidth = 1000;
+const double worldHeight = 10;
+const double worldWidth = 10;
 const double world2pixel = mapHeight / worldHeight;
 const int outlierCnt = 3; // 离群点检测范围
 
 #define sampleNum 1000 // 采样点个数
 
-const double dstX = -2.0;
-const double dstY = -2.0;
+const double dstX = -4.5;
+const double dstY = -4.5;
 
 #define INF 100000
 

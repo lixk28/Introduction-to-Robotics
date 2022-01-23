@@ -2,8 +2,8 @@
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.7862841013936881 -0.010812087789542754 -0.617770516173402 0.04451036729717969
-  position 2.4748178165642822 -1.2980403736709343 31.963443670394703
+  orientation 0.9984600923632132 0.0012480757654875904 0.055460673138064014 0.04506937924216269
+  position 3.714720624881112 -1.4620648654053987 32.010344656684026
 }
 TexturedBackground {
 }
@@ -150,7 +150,7 @@ Wall {
 }
 Robot {
   translation 4 4 0.04
-  rotation 0 0 1 0
+  rotation 0 0 -1 -2.8797853071795863
   children [
     Lidar {
       translation 0 0 0.06
@@ -279,11 +279,10 @@ Robot {
       }
     }
   ]
-  name "robot(1)"
   boundingObject USE BODY
   physics Physics {
     density -1
     mass 1
   }
-  controller "my_controller"
+  controller "my_controller3"
 }
