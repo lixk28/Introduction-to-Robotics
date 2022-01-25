@@ -3,8 +3,8 @@ WorldInfo {
   basicTimeStep 50
 }
 Viewpoint {
-  orientation 0 1 0 0
-  position 1.0688495203242423 0.10208713497300656 16.359021691037693
+  orientation 0.9486789497181968 -0.004743434277265742 -0.31620523429069974 0.03162265801407504
+  position 0.26708223041688806 -0.30204740183262757 9.181329020091683
   followType "None"
 }
 TexturedBackground {
@@ -119,11 +119,12 @@ Wall {
 }
 Robot {
   translation 1.8 2.5 0.04
-  rotation 0 0 1 -1.5707953071795862
+  rotation 0 0 1 -2.094395307179586
   children [
     Lidar {
       translation 0 0 0.06
       rotation 0.5773509358554485 0.5773489358556708 0.5773509358554485 2.0943999999999994
+      fieldOfView 3.14159
       numberOfLayers 1
       maxRange 8
       type "rotating"

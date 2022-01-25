@@ -47,8 +47,10 @@ const int outlierCnt = 3; // 离群点检测范围
 
 #define sampleNum 1000 // 采样点个数
 
-const double dstX = -2.0;
-const double dstY = -2.0;
+const double dstX = -1.8;
+const double dstY = -1.8;
+
+int graph[sampleNum + 2][sampleNum + 2]; // 邻接矩阵
 
 #define INF 100000
 
@@ -146,7 +148,7 @@ vector<point> astar(int graph[][sampleNum + 2], vector<point> vertex2coord, poin
   map<int, int> fScore;
   fScore[0] = distance(vertex2coord[0], vertex2coord[1]); // 起点的 f 值为起点和终点的距离
   for (int i = 1; i < sampleNum + 2; i++)
-    fScore[0] = INF;
+    fScore[i] = INF;
 
   while (openSet.size() > 0)
   {
@@ -197,8 +199,7 @@ vector<point> prm(Mat map, point src, point dst)
   vertex2coord.push_back(src); // 索引 0 对应起点 (即小车位置)
   vertex2coord.push_back(dst); // 索引 1 对应终点
 
-  int graph[sampleNum + 2][sampleNum + 2]; // 邻接矩阵
-  memset(graph, 0, sizeof(int) * (sampleNum + 2) * (sampleNum + 2));
+  // memset(graph, 0, sizeof(int) * (sampleNum + 2) * (sampleNum + 2));
 
   while (vertex2coord.size() < sampleNum + 2)
   {
@@ -213,11 +214,15 @@ vector<point> prm(Mat map, point src, point dst)
 
   for (int i = 0; i < sampleNum + 2; i++)
   {
-    for (int j = 0; j < sampleNum + 2; j++)
+    for (int j = i; j < sampleNum + 2; j++)
     {
       if (i != j && distance(vertex2coord[i], vertex2coord[j]) <= 100 && is_collision(map, vertex2coord[i], vertex2coord[j]) == false)
       {
-        graph[i][j] = distance(vertex2coord[i], vertex2coord[j]);
+        graph[i][j] = graph[j][i] = distance(vertex2coord[i], vertex2coord[j]);
+      }
+      else
+      {
+        graph[i][j] = graph[j][i] = 0;
       }
     }
   }
@@ -225,26 +230,36 @@ vector<point> prm(Mat map, point src, point dst)
   vector<point> path = astar(graph, vertex2coord, src, dst);
   reverse(path.begin(), path.end());
 
-#ifdef DEBUG
-  Mat tmp_map = map.clone();
-  for (point &i : path)
-  {
-    printf("(%d, %d)\n", i.x, i.y);
-    circle(tmp_map, Point(i.y, i.x), 3, 0, -1);
-  }
-  imshow("astar_debug", tmp_map);
-  waitKey(1);
-#endif
+// #ifdef DEBUG
+//   Mat tmp_map = map.clone();
+//   for (point &i : path)
+//   {
+//     printf("(%d, %d)\n", i.x, i.y);
+//     circle(tmp_map, Point(i.y, i.x), 3, 0, -1);
+//   }
+//   imshow("astar_debug", tmp_map);
+//   waitKey(1);
+// #endif
 
   return path;
 }
 
-double thershold = 0.06;
+bool needPlan(Mat map, vector<point> path, point car_pos)
+{
+  for (int i = 0; i < path.size() - 1; i++)
+  {
+    if (is_collision(map, path[i], path[i+1]))
+      return true;
+  }
+
+  return is_collision(map, car_pos, path[1]);
+}
+
+double thershold = 0.05;
 
 double convertDiffToDirection(point start, point end)
 {
-  
-  return -atan2(end.x - start.x, end.y - start.y);;
+  return -atan2(end.x - start.x, end.y - start.y);
 }
 
 char control(double currentYaw, double pathDirection)
@@ -257,32 +272,32 @@ char control(double currentYaw, double pathDirection)
   }
   else
   { //find path
-    double oppositeYaw = currentYaw > 0 ? currentYaw - M_PI : currentYaw + M_PI;
-    printf("yaw:%lf dire:%lf opposite yaw:%lf\n", currentYaw, pathDirection,oppositeYaw);
-    if (pathDirection > currentYaw && pathDirection < oppositeYaw)
+    // double oppositeYaw = currentYaw > 0 ? currentYaw - M_PI : currentYaw + M_PI;
+    // printf("yaw:%lf dire:%lf opposite yaw:%lf\n", currentYaw, pathDirection,oppositeYaw);
+    if (currentYaw < 0)
     {
-    keyValue = 'Q'; //turn left
+      if (pathDirection > currentYaw && pathDirection < currentYaw + M_PI)
+      {
+        keyValue = 'Q'; //turn left
+      }
+      else
+      {
+        keyValue = 'E'; //turn right
+      }
     }
     else
     {
-    keyValue = 'E'; //turn right
+      if (pathDirection > currentYaw || pathDirection < currentYaw - M_PI)
+      {
+        keyValue = 'Q'; //turn left
+      }
+      else
+      {
+        keyValue = 'E'; //turn right
+      }
     }
   }
   return keyValue;
-}
-
-bool doweneedplan(Mat map, Mat prev_map)
-{
-  int cnt = 0;
-  for (int i = 0; i < mapHeight; i++)
-  {
-    for (int j = 0; j < mapWidth; j++)
-    {
-      if (map.data[i * mapWidth + j] != prev_map.data[i * mapWidth + j])
-        cnt++;
-    }
-  }
-  return cnt > 10;
 }
 
 int main(int argc, char **argv)
@@ -324,7 +339,7 @@ int main(int argc, char **argv)
 
   // printf("%d\n", map.channels());
 
-  int cnt = 0, maxCnt = 30;
+  int cnt = 0, maxCnt = 60;
 
   vector<point> path;
 
@@ -347,9 +362,6 @@ int main(int argc, char **argv)
     // cout << "rpy = " << carAngle << endl;
 
     // step1 建图
-    // Mat lidarPoints(mapHeight, mapWidth, CV_8U, 255);
-    // circle(lidarPoints, Point2d(carPixelX, carPixelY), 3, 0, -1);
-
     if (cnt < 4) // 减速过程
       keyValue = 0;
 
@@ -381,11 +393,10 @@ int main(int argc, char **argv)
           if (imgX >= 0 && imgX < map.cols && imgY >= 0 && imgY < map.rows)
           {
             // circle(lidarPoints, Point(imgX, imgY), 1, 0);
-            circle(map, Point(imgX, imgY), 15, 0, -1);
+            circle(map, Point(imgX, imgY), 20, 0, -1);
           }
         }
       }
-      // imshow("lidar points", lidarPoints);
 
       // imshow("map", map);
       // waitKey(1);
@@ -393,41 +404,47 @@ int main(int argc, char **argv)
 
     // step2
     // 判断是否需要规划
-    // bool needPlan = doweneedplan(map, prev_map);
-
-    // // step3
-    // // 规划
-    // // if (needPlan == true)
-    // // {
-    // // prev_map = map.clone(); // crap
-    if (cnt == 10)
-    {
+    // 检测小车位置到下一个最近的规划点之间是否有障碍
+    // 还要检测路径上是否有障碍，可以提前规划新的路径 todo，修改 needPlan 函数
+    // if (cnt == 5)
+    // {
       point car_pos(carPixelY, carPixelX);
       point dst_pos(dstPixelY, dstPixelX);
-      path = prm(map, car_pos, dst_pos);
-    }
-    // // path = reducePath(map, path);
-    // // }
+      if (path.empty() || needPlan(map, path, car_pos))
+      {     
+        path = prm(map, car_pos, dst_pos);
+      }     
+    // }
+
+    // step3
+    // 规划
+    // if (cnt == 5 || path.empty() || distance(path[1], point(carPixelY, carPixelX)) < 5)
+    // {
+    //   point car_pos(carPixelY, carPixelX);
+    //   point dst_pos(dstPixelY, dstPixelX);
+    //   path = prm(map, car_pos, dst_pos);
+    // }
 
     // step4
     // 控制
-    if (path.size() > 1 && cnt > 10)
+    if (cnt > 4)
     {
-      // printf("%d\n",path.size());
-      // printf("%d %d\n",path[0].x,path[0].y);
-      // printf("%d %d\n",path[1].x,path[1].y);
-      int i = 1;
-      if (distance(path[i], point(carPixelY, carPixelX)) < 10)
+      if (distance(car_pos, path[1]) < 5)
       {
-        i++;
+        path.erase(path.begin());
       }
-      double direction = convertDiffToDirection(path[i-1], path[i]);
+      double direction = convertDiffToDirection(path[0], path[1]);
       keyValue = control(carAngle, direction);
     }
 
     cnt++;
     if (cnt >= maxCnt)
       cnt -= maxCnt;
+
+    if (distance(car_pos, dst_pos) < 10)
+    {
+      keyValue = 'Z';
+    }
 
     setSpeed(keyValue, speed);
 

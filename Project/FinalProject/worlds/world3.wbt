@@ -2,8 +2,8 @@
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.9984600923632132 0.0012480757654875904 0.055460673138064014 0.04506937924216269
-  position 3.714720624881112 -1.4620648654053987 32.010344656684026
+  orientation -0.9950369285117923 -0.0012437968084916848 0.09949856213693538 0.02512468257456667
+  position 0.005131612944468898 0.40036155922493916 15.993270038779569
 }
 TexturedBackground {
 }
@@ -149,14 +149,15 @@ Wall {
   size 1 2 0.1
 }
 Robot {
-  translation 4 4 0.04
+  translation 4.5 4.5 0.04
   rotation 0 0 -1 -2.8797853071795863
   children [
     Lidar {
       translation 0 0 0.06
       rotation 0.5773509358554485 0.5773489358556708 0.5773509358554485 2.0943999999999994
+      fieldOfView 3.14159
       numberOfLayers 1
-      maxRange 5
+      maxRange 8
       type "rotating"
     }
     GPS {
@@ -279,6 +280,7 @@ Robot {
       }
     }
   ]
+  name "car"
   boundingObject USE BODY
   physics Physics {
     density -1
