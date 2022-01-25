@@ -21,7 +21,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#define DEBUG
+//#define DEBUG
 
 using namespace std;
 using namespace webots;
@@ -32,8 +32,8 @@ double speedForward[4] = {v, v, v, v};
 double speedBackward[4] = {-v, -v, -v, -v};
 double speedLeftward[4] = {0.4 * v, 0.4 * v, v, v};
 double speedRightward[4] = {v, v, 0.4 * v, 0.4 * v};
-double speedLeftCircle[4] = {-0.1 * v, -0.1 * v, 0.1 * v, 0.1 * v};
-double speedRightCircle[4] = {0.1 * v, 0.1 * v, -0.1 * v, -0.1 * v};
+double speedLeftCircle[4] = {-0.3 * v, -0.3 * v, 0.3 * v, 0.3 * v};
+double speedRightCircle[4] = {0.3 * v, 0.3 * v, -0.3 * v, -0.3 * v};
 
 void setSpeed(int keyValue, double *speed);
 
@@ -45,7 +45,7 @@ const double worldWidth = 10;
 const double world2pixel = mapHeight / worldHeight;
 const int outlierCnt = 3; // 离群点检测范围
 
-#define sampleNum 3000 // 采样点个数
+#define sampleNum 5000 // 采样点个数
 
 const double dstX = -4.5;
 const double dstY = -4.5;
@@ -456,8 +456,10 @@ int main(int argc, char **argv)
       {
         path.erase(path.begin());
       }
-      double direction = convertDiffToDirection(path[0], path[1]);
-      keyValue = control(carAngle, direction);
+      if(path.size()>1){
+        double direction = convertDiffToDirection(path[0], path[1]);
+        keyValue = control(carAngle, direction);
+      }
     }
 
     cnt++;
