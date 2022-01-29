@@ -2,7 +2,7 @@
 
 This repository contains all my homework and final project while studying DCS361: Introduction to Robotics taught by Hui Cheng (成慧) at Sun Yat-sen University.
 
-All the homework is finished with Webots R2021a under Ubuntu 20.04.3, I didn't test them in other operating systems, but it should also work just fine if you've install all the dependencies and set the environment variables correctly.
+All the homework is finished with Webots R2021a under Ubuntu 20.04.3, and I didn't test it on any other operating systems, but it should also work just fine if you've installed the dependencies and set the environment variables correctly.
 
 Contents:
 
